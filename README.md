@@ -114,9 +114,10 @@ Enter customer details and click **Predict** to view the result.
 ## Author
 
 Khant Zay Soe
+
 Machine Learning developer
 
-GitHub: [https://github.com/KhantZaySoe](https://github.com/KhantZaySoe)
+
 
 ---
 
