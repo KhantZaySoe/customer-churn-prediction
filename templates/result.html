@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --text-primary: #ffffff;
+            --text-secondary: #adb5bd;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --card-bg: rgba(17, 24, 39, 0.85);
+            --churn-red: #f87171;
+            --churn-red-bg: rgba(239, 68, 68, 0.1);
+            --no-churn-green: #22c55e;
+            --accent-cyan: #22d3ee;
+            --accent-blue: #0ea5e9;
+        }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-image: url('/static/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-primary);
+            margin: 0; 
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container { 
+            width: 100%;
+            max-width: 700px; 
+            text-align: center;
+            background: var(--card-bg); 
+            padding: 2.5rem 3rem; 
+            border-radius: 16px; 
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .result-box {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 1px solid transparent;
+        }
+        .result-box .prediction-text {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        .result-box .probability-text {
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        .churn {
+            background-color: var(--churn-red-bg);
+            border-color: var(--churn-red);
+            color: var(--churn-red);
+        }
+        .no-churn {
+            background-color: var(--no-churn-green);
+            color: var(--text-primary);
+        }
+        .info-section {
+            text-align: left;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+        .info-section h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .info-section ul {
+            padding-left: 20px;
+            margin: 0;
+            list-style-type: '✓  ';
+        }
+        .info-section li {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th { font-weight: 600; color: var(--text-primary); }
+        td { font-family: monospace, monospace; font-size: 1.1rem; color: var(--accent-cyan); }
+
+        a.button { 
+            display: inline-block; 
+            margin-top: 2rem; 
+            padding: 12px 25px; 
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            color: white; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        a.button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prediction Result</h1>
+        
+        {% if status == 'churn' %}
+            <div class="result-box churn">
+                <p class="prediction-text">{{ prediction_text }}</p>
+                <p class="probability-text">{{ probability_text }}</p>
+            </div>
+            
+            {% if reasons %}
+            <div class="info-section">
+                <h2>Possible High-Risk Factors:</h2>
+                <ul>
+                    {% for reason in reasons %}
+                        <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <div class="result-box no-churn">
+                <p class="prediction-text">{{ prediction_text }}</p>
+                <p class="probability-text">{{ probability_text }}</p>
+            </div>
+        {% endif %}
+
+        <!-- VVVVVV THIS IS THE NEW PERFORMANCE SECTION VVVVVV -->
+        <div class="info-section">
+            <h2>Overall Model Performance</h2>
+            <table>
+                <tr>
+                    <th>Model Name</th>
+                    <td>{{ results.best_model_name }}</td>
+                </tr>
+                <tr>
+                    <th>Accuracy</th>
+                    <td>{{ "%.2f"|format(results.accuracy * 100) }}%</td>
+                </tr>
+                <tr>
+                    <th>Churn Precision</th>
+                    <td>{{ "%.2f"|format(results.classification_report['1'].precision * 100) }}%</td>
+                </tr>
+                <tr>
+                    <th>Churn Recall</th>
+                    <td>{{ "%.2f"|format(results.classification_report['1'].recall * 100) }}%</td>
+                </tr>
+            </table>
+        </div>
+        <!-- ^^^^^^ END OF NEW SECTION ^^^^^^ -->
+        
+        <a href="/" class="button">Make Another Prediction</a>
+    </div>
+</body>
+</html>
+

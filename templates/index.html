@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Churn Prediction</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Delius+Swash+Caps&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Libertinus+Serif+Display&family=Space+Grotesk:wght@300..700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap');
+    </style>
+    <style>
+      :root {
+        --bg-dark: #111827;
+        --card-bg: rgba(31, 41, 55, 0.6);
+        --border-color: rgba(255, 255, 255, 0.1);
+        --text-primary: #e5e7eb;
+        --text-secondary: #9ca3af;
+        --accent-purple: #8b5cf6;
+        --accent-pink: #ec4899;
+        --glow-color: #ec4899;
+      }
+      
+      body {
+        font-family: "Winky Rough", sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 2rem;
+      }
+      
+      .container {
+        max-width: 800px;
+        margin: auto;
+        background: var(--card-bg);
+        padding: 2.5rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      
+      h1,
+      h2 {
+        text-align: center;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.5rem;
+      }
+      
+      h2 {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 1.1rem;
+        margin-top: 0;
+        margin-bottom: 3rem;
+      }
+      
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.75rem;
+      }
+      
+      /* VVVVVV NEW STYLE FOR SECTION TITLES VVVVVV */
+      .form-section-title {
+        grid-column: 1 / -1; /* Make the title span the full width of the grid */
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-top: 1rem; /* Add some space above the title */
+        margin-bottom: 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+      /* ^^^^^^ END OF NEW STYLE ^^^^^^ */
+      
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      label {
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+      
+      input,
+      select {
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        font-size: 1rem;
+        background-color: #374151;
+        color: var(--text-primary);
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+      
+      select option:disabled {
+        color: #777;
+      }
+      
+      input[readonly] {
+        background-color: #4b5563;
+        cursor: not-allowed;
+      }
+      
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4);
+      }
+      
+      .button-wrapper {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: center;
+        margin-top: 1.5rem;
+      }
+      
+      .animated-btn {
+        position: relative;
+        display: inline-block;
+        padding: 15px 30px;
+        color: var(--glow-color);
+        background-color: transparent;
+        border: none;
+        font-size: 16px;
+        text-decoration: none;
+        text-transform: uppercase;
+        overflow: hidden;
+        transition: 0.5s;
+        letter-spacing: 4px;
+        cursor: pointer;
+      }
+      
+      .animated-btn:hover {
+        background: #d94685;
+        color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 5px #d94685, 0 0 25px #d94685;
+      }
+      
+      .animated-btn span {
+        position: absolute;
+        display: block;
+      }
+      
+      .animated-btn span:nth-child(1) {
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--glow-color));
+        animation: btn-anim1 1.5s linear infinite;
+      }
+      
+      @keyframes btn-anim1 {
+        0% {
+          left: -100%;
+        }
+        50%,
+        100% {
+          left: 100%;
+        }
+      }
+      
+      .animated-btn span:nth-child(2) {
+        top: -100%;
+        right: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(180deg, transparent, var(--glow-color));
+        animation: btn-anim2 1.5s linear infinite;
+        animation-delay: 0.375s;
+      }
+      
+      @keyframes btn-anim2 {
+        0% {
+          top: -100%;
+        }
+        50%,
+        100% {
+          top: 100%;
+        }
+      }
+      
+      .animated-btn span:nth-child(3) {
+        bottom: 0;
+        right: -100%;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(270deg, transparent, var(--glow-color));
+        animation: btn-anim3 1.5s linear infinite;
+        animation-delay: 0.75s;
+      }
+      
+      @keyframes btn-anim3 {
+        0% {
+          right: -100%;
+        }
+        50%,
+        100% {
+          right: 100%;
+        }
+      }
+      
+      .animated-btn span:nth-child(4) {
+        bottom: -100%;
+        left: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(360deg, transparent, var(--glow-color));
+        animation: btn-anim4 1.5s linear infinite;
+        animation-delay: 1.125s;
+      }
+      
+      @keyframes btn-anim4 {
+        0% {
+          bottom: -100%;
+        }
+        50%,
+        100% {
+          bottom: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Customer Churn Prediction</h1>
+      <h2>Enter customer details to predict churn probability</h2>
+
+      <form action="/predict" method="post">
+        <div class="form-grid">
+          <!-- VVVVVV NEW CATEGORY TITLES ADDED HERE VVVVVV -->
+          <h3 class="form-section-title">Customer Information</h3>
+
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select name="gender" id="gender" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="SeniorCitizen">Senior Citizen</label>
+            <select name="SeniorCitizen" id="SeniorCitizen" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="0">No</option>
+              <option value="1">Yes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="Partner">Partner</label>
+            <select name="Partner" id="Partner" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="Dependents">Dependents</label>
+            <select name="Dependents" id="Dependents" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </div>
+
+          <h3 class="form-section-title">Account & Billing</h3>
+
+          <div class="form-group">
+            <label for="tenure">Tenure (Months)</label>
+            <input type="number" name="tenure" id="tenure" required min="0" placeholder="e.g., 12" />
+          </div>
+          <div class="form-group">
+            <label for="MonthlyCharges">Monthly Charges ($)</label>
+            <input type="number" step="0.01" name="MonthlyCharges" id="MonthlyCharges" required min="0" placeholder="e.g., 70.00" />
+          </div>
+          <div class="form-group">
+            <label for="TotalCharges">Total Charges ($)</label>
+            <input type="number" step="0.01" name="TotalCharges" id="TotalCharges" required min="0" readonly placeholder="Auto-calculated" />
+          </div>
+          <div class="form-group">
+            <label for="Contract">Contract</label>
+            <select name="Contract" id="Contract" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="Month-to-month">Month-to-month</option>
+              <option value="One year">One year</option>
+              <option value="Two year">Two year</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="PaymentMethod">Payment Method</label>
+            <select name="PaymentMethod" id="PaymentMethod" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="Electronic check">Electronic check</option>
+              <option value="Mailed check">Mailed check</option>
+              <option value="Bank transfer (automatic)">Bank transfer (automatic)</option>
+              <option value="Credit card (automatic)">Credit card (automatic)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="PaperlessBilling">Paperless Billing</label>
+            <select name="PaperlessBilling" id="PaperlessBilling" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <h3 class="form-section-title">Subscribed Services</h3>
+
+          <div class="form-group">
+            <label for="PhoneService">Phone Service</label>
+            <select name="PhoneService" id="PhoneService" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="MultipleLines">Multiple Lines</label>
+            <select name="MultipleLines" id="MultipleLines" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+              <option value="No phone service">No phone service</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="InternetService">Internet Service</label>
+            <select name="InternetService" id="InternetService" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="DSL">DSL</option>
+              <option value="Fiber optic">Fiber optic</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="OnlineSecurity">Online Security</label>
+            <select name="OnlineSecurity" id="OnlineSecurity" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+              <option value="No internet service">No internet service</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="OnlineBackup">Online Backup</label>
+            <select name="OnlineBackup" id="OnlineBackup" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+              <option value="No internet service">No internet service</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="DeviceProtection">Device Protection</label>
+            <select name="DeviceProtection" id="DeviceProtection" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+              <option value="No internet service">No internet service</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="TechSupport">Tech Support</label>
+            <select name="TechSupport" id="TechSupport" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+              <option value="No internet service">No internet service</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="StreamingTV">Streaming TV</label>
+            <select name="StreamingTV" id="StreamingTV" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+              <option value="No internet service">No internet service</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="StreamingMovies">Streaming Movies</label>
+            <select name="StreamingMovies" id="StreamingMovies" required>
+              <option value="" disabled selected>Select an Option</option>
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+              <option value="No internet service">No internet service</option>
+            </select>
+          </div>
+
+          <div class="button-wrapper">
+            <button type="submit" class="animated-btn">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              Predict Churn
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const tenureInput = document.getElementById('tenure')
+      const monthlyChargesInput = document.getElementById('MonthlyCharges')
+      const totalChargesInput = document.getElementById('TotalCharges')
+      
+      function calculateTotalCharges() {
+        const tenureValue = tenureInput.value
+        const monthlyChargesValue = monthlyChargesInput.value
+      
+        if (tenureValue && monthlyChargesValue) {
+          const tenure = parseFloat(tenureValue)
+          const monthlyCharges = parseFloat(monthlyChargesValue)
+          const total = tenure * monthlyCharges
+          totalChargesInput.value = total.toFixed(2)
+        } else {
+          totalChargesInput.value = ''
+        }
+      }
+      
+      tenureInput.addEventListener('input', calculateTotalCharges)
+      monthlyChargesInput.addEventListener('input', calculateTotalCharges)
+    </script>
+  </body>
+</html>
